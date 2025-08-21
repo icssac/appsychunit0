@@ -703,6 +703,19 @@ const FlashcardStudyApp = () => {
                       ✗ Incorrect. The answer is "{currentWord.original}"
                     </div>
                   )}
+                  
+                  {currentScrambleIndex < scrambleWords.length - 1 && (
+                    <button
+                      onClick={() => {
+                        setCurrentScrambleIndex(prev => prev + 1);
+                        setScrambleInput('');
+                        setShowScrambleResult(false);
+                      }}
+                      className="mt-4 bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
+                    >
+                      Next Word
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -727,14 +740,14 @@ const FlashcardStudyApp = () => {
             <Home className="h-5 w-5 mr-2" />
             Home
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">Crossword Puzzle</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Find the Terms</h1>
           <div className="text-sm text-gray-600">
             {Object.keys(crosswordAnswers).length} / {crosswordClues.length} completed
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-6">Clues - Enter the psychology terms:</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-6">Find the Terms - Enter the psychology terms:</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {crosswordClues.map((clue) => (
@@ -875,6 +888,19 @@ const FlashcardStudyApp = () => {
                     Incorrect. The correct answer is: "{currentQuestion.correctAnswer}"
                   </div>
                 )}
+                
+                {currentQuestionIndex < quizQuestions.length - 1 && (
+                  <button
+                    onClick={() => {
+                      setCurrentQuestionIndex(prev => prev + 1);
+                      setSelectedAnswer('');
+                      setShowQuizResult(false);
+                    }}
+                    className="mt-4 bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600"
+                  >
+                    Next Question
+                  </button>
+                )}
               </div>
             )}
 
@@ -903,7 +929,7 @@ const FlashcardStudyApp = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[600px] overflow-y-auto">
             {cards.map((card, index) => (
               <div key={card.id} className={`p-4 border-b border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                 <div className="font-semibold text-gray-800 mb-2">{card.term}</div>
