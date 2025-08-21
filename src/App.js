@@ -929,7 +929,7 @@ const FlashcardStudyApp = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="max-h-[600px] overflow-y-auto">
+          <div className="max-h-[800px] overflow-y-auto">
             {cards.map((card, index) => (
               <div key={card.id} className={`p-4 border-b border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                 <div className="font-semibold text-gray-800 mb-2">{card.term}</div>
