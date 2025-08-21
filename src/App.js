@@ -35,13 +35,13 @@ const FlashcardStudyApp = () => {
   const [scrambleCompleted, setScrambleCompleted] = useState(false);
   const [showScrambleResult, setShowScrambleResult] = useState(false);
 
-  // Find the Terms state  
-const [findTermsClues, setFindTermsClues] = useState([]);
-const [findTermsAnswers, setFindTermsAnswers] = useState({});
+  // Find the Term state  
+  const [findTermsClues, setfindTermsClues] = useState([]);
+  const [findTermsAnswers, setfindTermsAnswers] = useState({});
 
   // Available units - you'll add more as you create them
   const availableUnits = [
-    { id: 'unit0', name: 'Unit 0', description: 'Scientific Methodology', fileName: 'UNIT0.csv' },
+    { id: 'unit0', name: 'Unit 0', description: 'Introduction to Psychology', fileName: 'UNIT0.csv' },
     // Add more units here as you create them:
     // { id: 'unit1', name: 'Unit 1', description: 'Research Methods', fileName: 'UNIT1.csv' },
     // { id: 'unit2', name: 'Unit 2', description: 'Biological Psychology', fileName: 'UNIT2.csv' },
@@ -297,8 +297,8 @@ const [findTermsAnswers, setFindTermsAnswers] = useState({});
       length: card.term.replace(/\s/g, '').length
     }));
     
-    setFindTermsClues(clues);
-    setFindTermsAnswers({});
+    setfindTermsClues(clues);
+    setfindTermsAnswers({});
   };
 
   const handleQuizAnswer = (answer) => {
@@ -788,13 +788,13 @@ const [findTermsAnswers, setFindTermsAnswers] = useState({});
             <div className="mt-8 text-center">
               <div className="bg-green-100 border border-green-500 rounded-lg p-6">
                 <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h3 className="text-2xl font-bold text-green-800 mb-2">All Terms Complete!</h3>
+                <h3 className="text-2xl font-bold text-green-800 mb-2">Find the Term Complete!</h3>
                 <p className="text-green-700">You solved all the clues! Great job!</p>
                 <button
                   onClick={startFindTerms}
                   className="mt-4 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
                 >
-                  New Find the Terms
+                  New Find the Term
                 </button>
               </div>
             </div>
