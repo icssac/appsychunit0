@@ -27,6 +27,19 @@ const FlashcardStudyApp = () => {
   const [showQuizResult, setShowQuizResult] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
 
+  // Word Scramble state
+  const [scrambleWords, setScrambleWords] = useState([]);
+  const [currentScrambleIndex, setCurrentScrambleIndex] = useState(0);
+  const [scrambleInput, setScrambleInput] = useState('');
+  const [scrambleScore, setScrambleScore] = useState(0);
+  const [scrambleCompleted, setScrambleCompleted] = useState(false);
+  const [showScrambleResult, setShowScrambleResult] = useState(false);
+
+  // Crossword state  
+  const [crosswordClues, setCrosswordClues] = useState([]);
+  const [crosswordAnswers, setCrosswordAnswers] = useState({});
+  const [crosswordCompleted, setCrosswordCompleted] = useState(false);
+
   // Available units - you'll add more as you create them
   const availableUnits = [
     { id: 'unit0', name: 'Unit 0', description: 'Scientific Methodology', fileName: 'UNIT0.csv' },
@@ -182,7 +195,20 @@ const FlashcardStudyApp = () => {
   };
 
   const handleCardClick = (card) => {
-    if (selectedCards.length === 2 || matchedPairs.includes(card.pairId) || selectedCards.find(c => c.id === card.id)) {
+    // If card is already matched, do nothing
+    if (matchedPairs.includes(card.pairId)) {
+      return;
+    }
+    
+    // If card is already selected, unselect it
+    const alreadySelected = selectedCards.find(c => c.id === card.id);
+    if (alreadySelected) {
+      setSelectedCards(prev => prev.filter(c => c.id !== card.id));
+      return;
+    }
+    
+    // If we already have 2 cards selected, do nothing
+    if (selectedCards.length === 2) {
       return;
     }
 
@@ -191,14 +217,17 @@ const FlashcardStudyApp = () => {
 
     if (newSelected.length === 2) {
       if (newSelected[0].pairId === newSelected[1].pairId) {
+        // Correct match - add points
         setTimeout(() => {
           setMatchedPairs(prev => [...prev, card.pairId]);
           setSelectedCards([]);
           setMatchingScore(prev => prev + 10);
         }, 1000);
       } else {
+        // Wrong match - deduct 5 points
         setTimeout(() => {
           setSelectedCards([]);
+          setMatchingScore(prev => Math.max(0, prev - 5)); // Don't go below 0
         }, 1000);
       }
     }
@@ -223,6 +252,55 @@ const FlashcardStudyApp = () => {
     setSelectedAnswer('');
     setShowQuizResult(false);
     setQuizCompleted(false);
+  };
+
+  const startWordScramble = () => {
+    const words = shuffleArray(cards).slice(0, 10).map((card, index) => ({
+      id: index,
+      original: card.term,
+      scrambled: card.term.split('').sort(() => Math.random() - 0.5).join(''),
+      definition: card.definition
+    }));
+    
+    setScrambleWords(words);
+    setCurrentScrambleIndex(0);
+    setScrambleInput('');
+    setScrambleScore(0);
+    setScrambleCompleted(false);
+    setShowScrambleResult(false);
+  };
+
+  const handleScrambleSubmit = () => {
+    const currentWord = scrambleWords[currentScrambleIndex];
+    const isCorrect = scrambleInput.toLowerCase().trim() === currentWord.original.toLowerCase();
+    
+    setShowScrambleResult(true);
+    if (isCorrect) {
+      setScrambleScore(prev => prev + 1);
+    }
+    
+    setTimeout(() => {
+      if (currentScrambleIndex < scrambleWords.length - 1) {
+        setCurrentScrambleIndex(prev => prev + 1);
+        setScrambleInput('');
+        setShowScrambleResult(false);
+      } else {
+        setScrambleCompleted(true);
+      }
+    }, 2000);
+  };
+
+  const startCrossword = () => {
+    const clues = shuffleArray(cards).slice(0, 8).map((card, index) => ({
+      id: index + 1,
+      clue: card.definition,
+      answer: card.term.toUpperCase().replace(/\s/g, ''),
+      length: card.term.replace(/\s/g, '').length
+    }));
+    
+    setCrosswordClues(clues);
+    setCrosswordAnswers({});
+    setCrosswordCompleted(false);
   };
 
   const handleQuizAnswer = (answer) => {
@@ -315,7 +393,7 @@ const FlashcardStudyApp = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => setCurrentMode('flashcards')}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Flashcards</h2>
@@ -344,6 +422,26 @@ const FlashcardStudyApp = () => {
               </div>
             </div>
             <p className="text-gray-600">Test your knowledge with multiple choice questions and get instant feedback.</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => { setCurrentMode('word-scramble'); startWordScramble(); }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Word Scramble</h2>
+              <div className="bg-orange-100 p-3 rounded-full">
+                <span className="text-orange-600 text-xl">🔤</span>
+              </div>
+            </div>
+            <p className="text-gray-600">Unscramble psychology terms using their definitions as hints.</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => { setCurrentMode('crossword'); startCrossword(); }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Crossword Puzzle</h2>
+              <div className="bg-red-100 p-3 rounded-full">
+                <span className="text-red-600 text-xl">🧩</span>
+              </div>
+            </div>
+            <p className="text-gray-600">Solve a crossword puzzle using psychology definitions as clues.</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => setCurrentMode('study-list')}>
@@ -512,6 +610,183 @@ const FlashcardStudyApp = () => {
         <div className="mt-6 text-center">
           <p className="text-gray-600">Match terms with their definitions</p>
           <p className="text-sm text-gray-500">Matched: {matchedPairs.length} / {matchingCards.length / 2}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentMode === 'word-scramble') {
+    if (scrambleCompleted) {
+      return (
+        <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-orange-50 to-red-100 min-h-screen">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Word Scramble Complete!</h2>
+            <div className="text-4xl font-bold text-orange-600 mb-4">
+              {scrambleScore} / {scrambleWords.length}
+            </div>
+            <div className="text-lg text-gray-600 mb-6">
+              {Math.round((scrambleScore / scrambleWords.length) * 100)}% Correct
+            </div>
+            <button
+              onClick={startWordScramble}
+              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 mr-4"
+            >
+              Play Again
+            </button>
+            <button
+              onClick={() => setCurrentMode('home')}
+              className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const currentWord = scrambleWords[currentScrambleIndex];
+    
+    return (
+      <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-orange-50 to-red-100 min-h-screen">
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => setCurrentMode('home')}
+            className="flex items-center text-orange-600 hover:text-orange-800"
+          >
+            <Home className="h-5 w-5 mr-2" />
+            Home
+          </button>
+          <h1 className="text-2xl font-bold text-gray-800">Word Scramble</h1>
+          <div className="text-sm text-gray-600">
+            {currentScrambleIndex + 1} / {scrambleWords.length}
+          </div>
+        </div>
+
+        {currentWord && (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg text-gray-600 mb-4">Definition (Hint):</h3>
+              <p className="text-xl text-gray-800 mb-6 italic">"{currentWord.definition}"</p>
+              
+              <h3 className="text-lg text-gray-600 mb-4">Unscramble this word:</h3>
+              <div className="text-3xl font-mono font-bold text-orange-600 mb-6 tracking-widest">
+                {currentWord.scrambled}
+              </div>
+
+              <input
+                type="text"
+                value={scrambleInput}
+                onChange={(e) => setScrambleInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !showScrambleResult && handleScrambleSubmit()}
+                className="w-full max-w-md px-4 py-3 text-xl text-center border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none mb-6"
+                placeholder="Type your answer here..."
+                disabled={showScrambleResult}
+              />
+
+              {!showScrambleResult && (
+                <button
+                  onClick={handleScrambleSubmit}
+                  disabled={!scrambleInput.trim()}
+                  className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit Answer
+                </button>
+              )}
+
+              {showScrambleResult && (
+                <div className="mt-6">
+                  {scrambleInput.toLowerCase().trim() === currentWord.original.toLowerCase() ? (
+                    <div className="text-green-600 font-semibold text-xl">
+                      ✓ Correct! The answer is "{currentWord.original}"
+                    </div>
+                  ) : (
+                    <div className="text-red-600 font-semibold text-xl">
+                      ✗ Incorrect. The answer is "{currentWord.original}"
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="text-center text-sm text-gray-600">
+              Score: {scrambleScore} / {currentScrambleIndex + (showScrambleResult ? 1 : 0)}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (currentMode === 'crossword') {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-red-50 to-pink-100 min-h-screen">
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => setCurrentMode('home')}
+            className="flex items-center text-red-600 hover:text-red-800"
+          >
+            <Home className="h-5 w-5 mr-2" />
+            Home
+          </button>
+          <h1 className="text-2xl font-bold text-gray-800">Crossword Puzzle</h1>
+          <div className="text-sm text-gray-600">
+            {Object.keys(crosswordAnswers).length} / {crosswordClues.length} completed
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-6">Clues - Enter the psychology terms:</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {crosswordClues.map((clue) => (
+              <div key={clue.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <span className="font-semibold text-red-600 text-lg">{clue.id}.</span>
+                  <span className="text-sm text-gray-500">({clue.length} letters)</span>
+                </div>
+                
+                <p className="text-gray-700 mb-3 italic">"{clue.clue}"</p>
+                
+                <input
+                  type="text"
+                  value={crosswordAnswers[clue.id] || ''}
+                  onChange={(e) => setCrosswordAnswers(prev => ({
+                    ...prev,
+                    [clue.id]: e.target.value.toUpperCase()
+                  }))}
+                  className={`w-full px-3 py-2 border-2 rounded focus:outline-none font-mono tracking-widest
+                    ${crosswordAnswers[clue.id]?.replace(/\s/g, '') === clue.answer 
+                      ? 'border-green-500 bg-green-50 text-green-700' 
+                      : 'border-gray-300 focus:border-red-500'}`}
+                  placeholder={`${clue.length} letters...`}
+                  maxLength={clue.length + 5}
+                />
+                
+                {crosswordAnswers[clue.id]?.replace(/\s/g, '') === clue.answer && (
+                  <div className="text-green-600 text-sm mt-2 font-semibold">✓ Correct!</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {Object.values(crosswordAnswers).filter((answer, index) => 
+            answer?.replace(/\s/g, '') === crosswordClues[index]?.answer
+          ).length === crosswordClues.length && crosswordClues.length > 0 && (
+            <div className="mt-8 text-center">
+              <div className="bg-green-100 border border-green-500 rounded-lg p-6">
+                <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
+                <h3 className="text-2xl font-bold text-green-800 mb-2">Crossword Complete!</h3>
+                <p className="text-green-700">You solved all the clues! Great job!</p>
+                <button
+                  onClick={startCrossword}
+                  className="mt-4 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
+                >
+                  New Crossword
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
