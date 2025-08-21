@@ -38,7 +38,6 @@ const FlashcardStudyApp = () => {
   // Crossword state  
   const [crosswordClues, setCrosswordClues] = useState([]);
   const [crosswordAnswers, setCrosswordAnswers] = useState({});
-  const [crosswordCompleted, setCrosswordCompleted] = useState(false);
 
   // Available units - you'll add more as you create them
   const availableUnits = [
@@ -300,7 +299,6 @@ const FlashcardStudyApp = () => {
     
     setCrosswordClues(clues);
     setCrosswordAnswers({});
-    setCrosswordCompleted(false);
   };
 
   const handleQuizAnswer = (answer) => {
