@@ -463,10 +463,11 @@ const FlashcardStudyApp = () => {
       <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => setCurrentMode('unit-selector')}
+            onClick={() => setCurrentMode('home')}
             className="flex items-center text-blue-600 hover:text-blue-800"
           >
-            📚 Choose Unit
+            <Home className="h-5 w-5 mr-2" />
+            Home
           </button>
           <h1 className="text-2xl font-bold text-gray-800">
             {currentUnit ? `${currentUnit.name} - ` : ''}Flashcards
