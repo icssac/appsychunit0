@@ -35,9 +35,9 @@ const FlashcardStudyApp = () => {
   const [scrambleCompleted, setScrambleCompleted] = useState(false);
   const [showScrambleResult, setShowScrambleResult] = useState(false);
 
-  // Crossword state  
-  const [crosswordClues, setCrosswordClues] = useState([]);
-  const [crosswordAnswers, setCrosswordAnswers] = useState({});
+  // Find the Terms state  
+  const [findTermsClues, setFindTermsClues] = useState([]);
+  const [findTermsAnswers, setFindTermsAnswers] = useState({});
 
   // Available units - you'll add more as you create them
   const availableUnits = [
@@ -289,7 +289,7 @@ const FlashcardStudyApp = () => {
     }, 2000);
   };
 
-  const startCrossword = () => {
+  const startFindTerms = () => {
     const clues = shuffleArray(cards).slice(0, 8).map((card, index) => ({
       id: index + 1,
       clue: card.definition,
@@ -297,8 +297,8 @@ const FlashcardStudyApp = () => {
       length: card.term.replace(/\s/g, '').length
     }));
     
-    setCrosswordClues(clues);
-    setCrosswordAnswers({});
+    setFindTermsClues(clues);
+    setFindTermsAnswers({});
   };
 
   const handleQuizAnswer = (answer) => {
