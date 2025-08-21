@@ -36,8 +36,8 @@ const FlashcardStudyApp = () => {
   const [showScrambleResult, setShowScrambleResult] = useState(false);
 
   // Find the Terms state  
-  const [findTermsClues, setFindTermsClues] = useState([]);
-  const [findTermsAnswers, setFindTermsAnswers] = useState({});
+const [findTermsClues, setFindTermsClues] = useState([]);
+const [findTermsAnswers, setFindTermsAnswers] = useState({});
 
   // Available units - you'll add more as you create them
   const availableUnits = [
@@ -432,14 +432,14 @@ const FlashcardStudyApp = () => {
             <p className="text-gray-600">Unscramble psychology terms using their definitions as hints.</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => { setCurrentMode('crossword'); startCrossword(); }}>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => { setCurrentMode('find-terms'); startFindTerms(); }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">Crossword Puzzle</h2>
+              <h2 className="text-xl font-semibold text-gray-800">Find the Term</h2>
               <div className="bg-red-100 p-3 rounded-full">
                 <span className="text-red-600 text-xl">🧩</span>
               </div>
             </div>
-            <p className="text-gray-600">Solve a crossword puzzle using psychology definitions as clues.</p>
+            <p className="text-gray-600">Find the term using psychology definitions as clues.</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" onClick={() => setCurrentMode('study-list')}>
@@ -730,7 +730,7 @@ const FlashcardStudyApp = () => {
     );
   }
 
-  if (currentMode === 'crossword') {
+  if (currentMode === 'find-terms') {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-red-50 to-pink-100 min-h-screen">
         <div className="flex items-center justify-between mb-6">
@@ -743,7 +743,7 @@ const FlashcardStudyApp = () => {
           </button>
           <h1 className="text-2xl font-bold text-gray-800">Find the Terms</h1>
           <div className="text-sm text-gray-600">
-            {Object.keys(crosswordAnswers).length} / {crosswordClues.length} completed
+            {Object.keys(findTermsAnswers).length} / {findTermsClues.length} completed
           </div>
         </div>
 
@@ -751,7 +751,7 @@ const FlashcardStudyApp = () => {
           <h3 className="text-xl font-semibold text-gray-800 mb-6">Find the Terms - Enter the psychology terms:</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {crosswordClues.map((clue) => (
+            {findTermsClues.map((clue) => (
               <div key={clue.id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
                   <span className="font-semibold text-red-600 text-lg">{clue.id}.</span>
@@ -762,39 +762,39 @@ const FlashcardStudyApp = () => {
                 
                 <input
                   type="text"
-                  value={crosswordAnswers[clue.id] || ''}
-                  onChange={(e) => setCrosswordAnswers(prev => ({
+                  value={findTermsAnswers[clue.id] || ''}
+                  onChange={(e) => setfindTermsAnswers(prev => ({
                     ...prev,
                     [clue.id]: e.target.value.toUpperCase()
                   }))}
                   className={`w-full px-3 py-2 border-2 rounded focus:outline-none font-mono tracking-widest
-                    ${crosswordAnswers[clue.id]?.replace(/\s/g, '') === clue.answer 
+                    ${findTermsAnswers[clue.id]?.replace(/\s/g, '') === clue.answer 
                       ? 'border-green-500 bg-green-50 text-green-700' 
                       : 'border-gray-300 focus:border-red-500'}`}
                   placeholder={`${clue.length} letters...`}
                   maxLength={clue.length + 5}
                 />
                 
-                {crosswordAnswers[clue.id]?.replace(/\s/g, '') === clue.answer && (
+                {findTermsAnswers[clue.id]?.replace(/\s/g, '') === clue.answer && (
                   <div className="text-green-600 text-sm mt-2 font-semibold">✓ Correct!</div>
                 )}
               </div>
             ))}
           </div>
 
-          {Object.values(crosswordAnswers).filter((answer, index) => 
-            answer?.replace(/\s/g, '') === crosswordClues[index]?.answer
-          ).length === crosswordClues.length && crosswordClues.length > 0 && (
+          {Object.values(findTermsAnswers).filter((answer, index) => 
+            answer?.replace(/\s/g, '') === findTermsClues[index]?.answer
+          ).length === findTermsClues.length && findTermsClues.length > 0 && (
             <div className="mt-8 text-center">
               <div className="bg-green-100 border border-green-500 rounded-lg p-6">
                 <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h3 className="text-2xl font-bold text-green-800 mb-2">Crossword Complete!</h3>
+                <h3 className="text-2xl font-bold text-green-800 mb-2">All Terms Complete!</h3>
                 <p className="text-green-700">You solved all the clues! Great job!</p>
                 <button
-                  onClick={startCrossword}
+                  onClick={startFindTerms}
                   className="mt-4 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
                 >
-                  New Crossword
+                  New Find the Terms
                 </button>
               </div>
             </div>
