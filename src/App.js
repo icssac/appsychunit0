@@ -1,74 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Trophy, Clock, Home, LogOut } from 'lucide-react';
-
-// Embedded data instead of CSV loading
-const psychologyTerms = [
-  { term: "Behavioral Perspective", definition: "Perspective focused on an individual's behavioral habits." },
-  { term: "Biological Perspective", definition: "Perspective focused on the physiological connection to psychology." },
-  { term: "Cognitive Perspective", definition: "Perspective focused on mental processes such as thinking." },
-  { term: "Humanistic Perspective", definition: "Perspective focused on each individual's potential for improving their life." },
-  { term: "Psychodynamic Perspective", definition: "Perspective focused on a individual's unconcious, built up primarily from childhood experiences." },
-  { term: "Sociocultural Perspective", definition: "Perspective focused on how individual's are influenced by their societal or cultural environment." },
-  { term: "Evolutionary Perspective", definition: "Perspective focused on examining psychology through the theme of evolution." },
-  { term: "Confirmation Bias", definition: "Only favoring information that supports prior beliefs, disregarding contradictory ones." },
-  { term: "Hindsight Bias", definition: "The \"I-knew-it-all-along\" phenomenon." },
-  { term: "Experiment", definition: "Research done by the researcher manipulating a variable to see its effect." },
-  { term: "Random Assignment", definition: "Method used to assign participants into different groups, ensuring equal chances of being assigned to all groups." },
-  { term: "Case Study", definition: "Study done in depth of a peculiar individual, group, or situation that can not be easily replicated." },
-  { term: "Correlational Study", definition: "Study focused on relationships between two or more variables without any manipulation involved." },
-  { term: "Meta-Analysis", definition: "Gathering and analyzing a mass of studies and drawing a single conclusion." },
-  { term: "Cross-Sectional Research", definition: "Research analyzing a large population of varying characteristics in a specific time period." },
-  { term: "Longitudinal Research", definition: "Research done over a long period of time with the same population." },
-  { term: "Naturalistic Observation", definition: "Researcher observes the sample in its natural environment." },
-  { term: "Operational Definition", definition: "Specific units of measurement of included procedures in the study." },
-  { term: "Replication", definition: "Repetition of a past study, ensuring processes are same as the original, to see if the result is same." },
-  { term: "Independent Variable", definition: "Variable that is manipulated or changed in the study." },
-  { term: "Dependent Variable", definition: "Variable thats being measured in the study." },
-  { term: "Representative Sample", definition: "Accurate collection of individuals that reflects all characteristics of the population." },
-  { term: "Convenience Sample", definition: "Easily accessible sample, but limited generalizability." },
-  { term: "Random Sampling", definition: "Method of selecting individuals from the population that makes sure each member is represented." },
-  { term: "Confounding Variable", definition: "Variable-separate from the independent variable-that might produce an effect." },
-  { term: "Sampling Bias", definition: "Choosing the wrong sample which results in an unrepresentative sample." },
-  { term: "Generalizability", definition: "The extent in which the findings of the study can be applicable to mainstream society." },
-  { term: "Experimental Group", definition: "Group that receives the treatment that is being studied." },
-  { term: "Control Group", definition: "Group that doesn't receive the treatment." },
-  { term: "Single Blind Procedure", definition: "Only the participants do not know which group they have been assigned to." },
-  { term: "Double Blind Procedure", definition: "Neither the participants nor the researcher are able to affect the outcome of the research." },
-  { term: "Experimenter Bias", definition: "Tendency for researchers to treat members of groups differently to confirm the researchers' hypothesis." },
-  { term: "Social Desirability Bias", definition: "Tendency to try to give answers that reflect well upone oneself." },
-  { term: "Qualitative Research", definition: "More complex textual responses and looks for key theme within them." },
-  { term: "Quantitative Research", definition: "Research that uses numeric measures(ex. survey)." },
-  { term: "Directionality Problem", definition: "Inability to tell which of the variables is affecting which." },
-  { term: "Third Variable Problem", definition: "Correlation between two variables being falsely attributed to other unmeasured variable." },
-  { term: "Correlation", definition: "Relationship between two variables without ascribing cause." },
-  { term: "Self-Report Bias", definition: "Tendency for individuals to inaccurately report their own behaviors often due to social desirablity." },
-  { term: "Informed Consent", definition: "Process where participants are provided with all necessary information and given their consent." },
-  { term: "Confidentiality", definition: "Participants' privacy is protected and undisclosed." },
-  { term: "Placebo Effect", definition: "Phenomenon when participant receives effect even if treatment has no inherent effect." },
-  { term: "Debrief", definition: "After the study, participants are told the purpose of the study." },
-  { term: "Measures of Central Tendency", definition: "Mean, median, mode." },
-  { term: "Normal Curve", definition: "Theoretical bell-shaped curve." },
-  { term: "Skewness", definition: "Positive when mean shifts right and negative when mean shifts left." },
-  { term: "Standard Deviation", definition: "Square root of the variance." },
-  { term: "Scatterplot", definition: "Resulted values shown in series of points on the graph." },
-  { term: "Correlation Coefficient", definition: "Strength of a correlation(-1~1)." },
-  { term: "Statistical Significance", definition: "p<0.05, results less likely to be happened by chance." }
-];
+import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Trophy, Clock, Home } from 'lucide-react';
 
 const FlashcardStudyApp = () => {
   const [cards, setCards] = useState([]);
-  const [currentMode, setCurrentMode] = useState('login');
+  const [currentMode, setCurrentMode] = useState('unit-selector');
+  const [currentUnit, setCurrentUnit] = useState(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffledCards, setShuffledCards] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginError, setLoginError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  // Login form state
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   
   // Matching game state
   const [matchingCards, setMatchingCards] = useState([]);
@@ -86,42 +27,87 @@ const FlashcardStudyApp = () => {
   const [showQuizResult, setShowQuizResult] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
 
-  // Load data on component mount
-  useEffect(() => {
-    const formattedCards = psychologyTerms.map((item, index) => ({
-      id: index,
-      term: item.term,
-      definition: item.definition
-    }));
-    
-    setCards(formattedCards);
-    setShuffledCards(formattedCards);
-  }, []);
+  // Available units - you'll add more as you create them
+  const availableUnits = [
+    { id: 'unit0', name: 'Unit 0', description: 'Scientific Methodology', fileName: 'UNIT0.csv' },
+    // Add more units here as you create them:
+    // { id: 'unit1', name: 'Unit 1', description: 'Research Methods', fileName: 'UNIT1.csv' },
+    // { id: 'unit2', name: 'Unit 2', description: 'Biological Psychology', fileName: 'UNIT2.csv' },
+  ];
 
-  // Authentication functions
-  const handleLogin = () => {
+  // Sample psychology terms - you can replace with your data
+  const defaultTerms = [
+    { id: 1, term: 'Psychology', definition: 'The scientific study of behavior and mental processes' },
+    { id: 2, term: 'Behaviorism', definition: 'A psychological approach that emphasizes the study of observable behaviors' },
+    { id: 3, term: 'Cognitive Psychology', definition: 'The study of mental processes including thinking, memory, and problem-solving' },
+    { id: 4, term: 'Neuroscience', definition: 'The study of the nervous system and brain' },
+    { id: 5, term: 'Classical Conditioning', definition: 'Learning through association, discovered by Ivan Pavlov' },
+    { id: 6, term: 'Operant Conditioning', definition: 'Learning through reinforcement and punishment' },
+    { id: 7, term: 'Gestalt Psychology', definition: 'A school emphasizing the whole of human experience' },
+    { id: 8, term: 'Psychoanalysis', definition: 'Freud\'s theory focusing on unconscious motivations' },
+    { id: 9, term: 'Humanistic Psychology', definition: 'An approach emphasizing human potential and self-actualization' },
+    { id: 10, term: 'Biological Psychology', definition: 'The study of how biological processes relate to behavior' },
+    { id: 11, term: 'Social Psychology', definition: 'The study of how social situations influence behavior' },
+    { id: 12, term: 'Developmental Psychology', definition: 'The study of how people change throughout their lives' },
+    { id: 13, term: 'Personality Psychology', definition: 'The study of individual differences in behavior patterns' },
+    { id: 14, term: 'Abnormal Psychology', definition: 'The study of psychological disorders and unusual behaviors' },
+    { id: 15, term: 'Research Methods', definition: 'Scientific techniques used to study psychological phenomena' }
+  ];
+
+  // Load terms for selected unit
+  const loadUnit = async (unit) => {
     setLoading(true);
-    setLoginError('');
+    setCurrentUnit(unit);
     
-    setTimeout(() => {
-      if (username.trim() === 'APPSYCH2025' && password.trim() === 'IVANPAVLOV') {
-        setIsAuthenticated(true);
-        setCurrentMode('home');
-        setLoginError('');
-      } else {
-        setLoginError('Invalid username or password');
+    try {
+      // Try to load CSV from public folder
+      const response = await fetch(`/${unit.fileName}`);
+      if (response.ok) {
+        const csvText = await response.text();
+        
+        // Simple CSV parsing without Papa Parse
+        const lines = csvText.split('\n');
+        const formattedCards = [];
+        
+        lines.forEach((line, index) => {
+          const columns = line.split(',');
+          if (columns.length >= 2) {
+            const term = columns[0]?.trim().replace(/['"]/g, '') || '';
+            const definition = columns[1]?.trim().replace(/['"]/g, '') || '';
+            
+            if (term && definition) {
+              formattedCards.push({
+                id: index,
+                term: term,
+                definition: definition
+              });
+            }
+          }
+        });
+        
+        if (formattedCards.length > 0) {
+          setCards(formattedCards);
+          setShuffledCards(formattedCards);
+          setCurrentMode('home');
+          setLoading(false);
+          return;
+        }
       }
-      setLoading(false);
-    }, 1000);
+    } catch (error) {
+      console.log(`Could not load ${unit.fileName}, using default terms`);
+    }
+    
+    // Fall back to default terms if CSV loading fails
+    setCards(defaultTerms);
+    setShuffledCards(defaultTerms);
+    setCurrentMode('home');
+    setLoading(false);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentMode('login');
-    setUsername('');
-    setPassword('');
-    setLoginError('');
-  };
+  // Initialize app - no auto-loading, wait for unit selection
+  useEffect(() => {
+    // App starts on unit selector screen
+  }, []);
 
   // Timer for matching game
   useEffect(() => {
@@ -264,66 +250,47 @@ const FlashcardStudyApp = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Login screen
-  if (!isAuthenticated) {
+  if (currentMode === 'unit-selector') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🧠</span>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Psychology Unit 0 Review Hub</h1>
-            <p className="text-gray-600">Sign in to access your Unit 0 review materials</p>
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen">
+        <div className="text-center mb-8">
+          <div className="bg-indigo-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🧠</span>
           </div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Psychology Review Hub</h1>
+          <p className="text-lg text-gray-600">Choose a unit to start studying</p>
+        </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter username"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter password"
-              />
-            </div>
-
-            {loginError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {loginError}
+        {loading ? (
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading unit...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {availableUnits.map((unit) => (
+              <div 
+                key={unit.id}
+                onClick={() => loadUnit(unit)}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-indigo-600">{unit.name.split(' ')[1]}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{unit.name}</h3>
+                  <p className="text-gray-600 text-sm">{unit.description}</p>
+                  <div className="mt-4 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-medium">
+                    Click to Start
+                  </div>
+                </div>
               </div>
-            )}
-
-            <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
+            ))}
           </div>
+        )}
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              Authorized users only. Contact administrator for access.
-            </p>
-          </div>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">More units will be added every two weeks!</p>
         </div>
       </div>
     );
@@ -334,16 +301,17 @@ const FlashcardStudyApp = () => {
       <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Psychology Unit 0 Review Hub</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+              {currentUnit ? currentUnit.name : 'Psychology'} Review Hub
+            </h1>
             <p className="text-lg text-gray-600">Master your psychology terms with multiple study modes</p>
             <p className="text-sm text-gray-500 mt-1">{cards.length} terms loaded</p>
           </div>
           <button
-            onClick={handleLogout}
-            className="flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            onClick={() => setCurrentMode('unit-selector')}
+            className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
+            📚 Choose Unit
           </button>
         </div>
 
@@ -382,9 +350,7 @@ const FlashcardStudyApp = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Study List</h2>
               <div className="bg-yellow-100 p-3 rounded-full">
-                <svg className="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <span className="text-yellow-600 text-xl">📋</span>
               </div>
             </div>
             <p className="text-gray-600">View all terms and definitions in an organized list format for quick review.</p>
@@ -401,13 +367,14 @@ const FlashcardStudyApp = () => {
       <div className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => setCurrentMode('home')}
+            onClick={() => setCurrentMode('unit-selector')}
             className="flex items-center text-blue-600 hover:text-blue-800"
           >
-            <Home className="h-5 w-5 mr-2" />
-            Home
+            📚 Choose Unit
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">Flashcards</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {currentUnit ? `${currentUnit.name} - ` : ''}Flashcards
+          </h1>
           <div className="flex space-x-2">
             <button
               onClick={handleShuffle}
