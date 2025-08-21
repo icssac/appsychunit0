@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Trophy, Clock, Upload, Home, LogOut, Save, Download } from 'lucide-react';
-import Papa from 'papaparse';
+import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Trophy, Clock, Home, LogOut } from 'lucide-react';
 
 // Embedded data instead of CSV loading
 const psychologyTerms = [
