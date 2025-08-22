@@ -281,7 +281,7 @@ const FlashcardStudyApp = () => {
 if (currentScrambleIndex === scrambleWords.length - 1) {
   setTimeout(() => setScrambleCompleted(true), 2000);
 }
-  
+};  
 
   const startFindTerms = () => {
     const clues = shuffleArray(cards).slice(0, 8).map((card, index) => ({
@@ -306,7 +306,7 @@ if (currentScrambleIndex === scrambleWords.length - 1) {
    if (currentQuestionIndex === quizQuestions.length - 1) {
   setTimeout(() => setQuizCompleted(true), 2000);
 }
-  
+};  
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
