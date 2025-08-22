@@ -278,15 +278,9 @@ const FlashcardStudyApp = () => {
       setScrambleScore(prev => prev + 1);
     }
     
-    setTimeout(() => {
-      if (currentScrambleIndex < scrambleWords.length - 1) {
-        setCurrentScrambleIndex(prev => prev + 1);
-        setScrambleInput('');
-        setShowScrambleResult(false);
-      } else {
-        setScrambleCompleted(true);
-      }
-    }, 2000);
+if (currentScrambleIndex === scrambleWords.length - 1) {
+  setTimeout(() => setScrambleCompleted(true), 2000);
+}
   };
 
   const startFindTerms = () => {
@@ -309,15 +303,9 @@ const FlashcardStudyApp = () => {
       setQuizScore(prev => prev + 1);
     }
     
-    setTimeout(() => {
-      if (currentQuestionIndex < quizQuestions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-        setSelectedAnswer('');
-        setShowQuizResult(false);
-      } else {
-        setQuizCompleted(true);
-      }
-    }, 2000);
+   if (currentQuestionIndex === quizQuestions.length - 1) {
+  setTimeout(() => setQuizCompleted(true), 2000);
+}
   };
 
   const formatTime = (seconds) => {
